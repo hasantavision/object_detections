@@ -32,6 +32,15 @@ def _parse_function(example_proto):
 
 
 if __name__ == '__main__':
+    # this block will retrieve data from tfrecord, we need this to know features of the tfrecord file
+    for raw_record in raw_dataset.take(1):
+        example = tf.train.Example()
+        example.ParseFromString(raw_record.numpy())
+
+    with open('coba.txt', 'w') as aw:
+        aw.write(str(example))
+    
+    # if we already know the features, we can run this and ofcourse define features in this code
     for data in raw_dataset:
         a = _parse_function(data)
         if a:
