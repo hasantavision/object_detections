@@ -1,3 +1,5 @@
+from PIL import Image
+import io
 import tensorflow as tf
 import cv2
 
@@ -33,5 +35,4 @@ if __name__ == '__main__':
     for data in raw_dataset:
         a = _parse_function(data)
         if a:
-            print(a["image/object/class/label"].numpy())
-            print(a["image/filename"].numpy().decode())
+            Image.open(io.BytesIO(a["image/encoded"].numpy())).save(a["image/filename"].numpy().decode())
