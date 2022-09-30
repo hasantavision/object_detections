@@ -103,10 +103,10 @@ def main():
             if shape['shape_type'] == 'rectangle':
                 (xmin, ymin), (xmax, ymax) = shape['points']
             elif shape['shape_type'] == 'polygon':
-                xmin = min(xmins[0] for xmins in shape['points'])
-                ymin = min(ymins[0] for ymins in shape['points'])
-                xmax = max(xmaxs[0] for xmaxs in shape['points'])
-                ymax = max(ymaxs[0] for ymaxs in shape['points'])
+                xmin = round(min(xmins[0] for xmins in shape['points']))
+                ymin = round(min(ymins[0] for ymins in shape['points']))
+                xmax = round(max(xmaxs[0] for xmaxs in shape['points']))
+                ymax = round(max(ymaxs[0] for ymaxs in shape['points']))
 
             # (xmin, ymin), (xmax, ymax) = shape["points"]
             # swap if min is larger than max.
