@@ -3,6 +3,7 @@
 from __future__ import print_function
 
 import argparse
+from ast import arg
 import glob
 import os
 import os.path as osp
@@ -67,7 +68,7 @@ def main():
         label_file = labelme.LabelFile(filename=filename)
 
         base = osp.splitext(osp.basename(filename))[0]
-        out_img_file = osp.join(args.output_dir, "JPEGImages", base + ".png" if args.format == 'png' else ".jpg")
+        out_img_file = osp.join(args.output_dir, "JPEGImages", base + (".png" if args.format == 'png' else ".jpg"))
         out_xml_file = osp.join(args.output_dir, "Annotations", base + ".xml")
         if not args.noviz:
             out_viz_file = osp.join(
@@ -75,21 +76,23 @@ def main():
             )
 
         img = labelme.utils.img_data_to_arr(label_file.imageData)
+        print(base, out_img_file)
         imgviz.io.imsave(out_img_file, img)
 
         maker = lxml.builder.ElementMaker()
         xml = maker.annotation(
-            maker.folder(),
-            maker.filename(base + ".png" if args.format == 'png' else ".jpg"),
-            maker.database(),  # e.g., The VOC2007 Database
-            maker.annotation(),  # e.g., Pascal VOC2007
-            maker.image(),  # e.g., flickr
+            maker.folder(args.input_dir),
+            maker.filename(base + (".png" if args.format == 'png' else ".jpg")),
+            maker.path(filename),
+            maker.source(
+                maker.database('Unknown'),  # e.g., The VOC2007 Database
+            ),
             maker.size(
-                maker.height(str(img.shape[0])),
                 maker.width(str(img.shape[1])),
+                maker.height(str(img.shape[0])),
                 maker.depth(str(img.shape[2])),
             ),
-            maker.segmented(),
+            maker.segmented('0'),
         )
 
         bboxes = []
@@ -106,7 +109,7 @@ def main():
             elif shape['shape_type'] == 'polygon':
                 # polygon shaped is:
                 # 'points':
-                #     [[x1, y1], [x2, y2], [x3, y3], etc...]
+                # [x1, y1], [x2, y2], [x3, y3], etc...
                 xmin = round(min(point[0] for point in shape['points']))
                 ymin = round(min(point[1] for point in shape['points']))
                 xmax = round(max(point[0] for point in shape['points']))
@@ -123,9 +126,9 @@ def main():
             xml.append(
                 maker.object(
                     maker.name(shape["label"]),
-                    maker.pose(),
-                    maker.truncated(),
-                    maker.difficult(),
+                    maker.pose('Unspecified'),
+                    maker.truncated('0'),
+                    maker.difficult('0'),
                     maker.bndbox(
                         maker.xmin(str(xmin)),
                         maker.ymin(str(ymin)),
