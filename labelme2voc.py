@@ -25,6 +25,7 @@ def main():
     )
     parser.add_argument("input_dir", help="input annotated directory")
     parser.add_argument("output_dir", help="output dataset directory")
+    parser.add_argument("--format", default='jpg', help="choose image format (jpg or png")
     parser.add_argument("--labels", help="labels file", required=True)
     parser.add_argument(
         "--noviz", help="no visualization", action="store_true"
@@ -66,7 +67,7 @@ def main():
         label_file = labelme.LabelFile(filename=filename)
 
         base = osp.splitext(osp.basename(filename))[0]
-        out_img_file = osp.join(args.output_dir, "JPEGImages", base + ".jpg")
+        out_img_file = osp.join(args.output_dir, "JPEGImages", base + ".png" if args.format == 'png' else ".jpg")
         out_xml_file = osp.join(args.output_dir, "Annotations", base + ".xml")
         if not args.noviz:
             out_viz_file = osp.join(
@@ -79,7 +80,7 @@ def main():
         maker = lxml.builder.ElementMaker()
         xml = maker.annotation(
             maker.folder(),
-            maker.filename(base + ".jpg"),
+            maker.filename(base + ".png" if args.format == 'png' else ".jpg"),
             maker.database(),  # e.g., The VOC2007 Database
             maker.annotation(),  # e.g., Pascal VOC2007
             maker.image(),  # e.g., flickr
